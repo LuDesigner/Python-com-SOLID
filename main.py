@@ -1,14 +1,9 @@
 from cliente import Cliente
 from item import Item
-from pedido.pedido_retirada import PedidoRetirada
 from pedido.pedido_delivery import PedidoDelivery
-from pagamento.pagamento_cartao import PagamentoCartao
-from pagamento.pagamento_pix import PagamentoPIX
 from pagamento.pagamento_factory import PagamentoFactory
-from notificacao.notificacao_email import NotificacaoEmail
-from notificacao.notificacao_sms import NotificacaoSMS
 from notificacao.notificacao_facade import NotificacaoFacade
-
+from observador.observador_status import ObservadorStatus
 
 cliente = Cliente("Lais", "Alura")
 item_um = Item("Pizza", 30.00)
@@ -17,23 +12,20 @@ itens = [item_um, item_dois]
 
 taxa_entrega = 10.00
 
-pedido_retirada = PedidoRetirada(cliente, itens)
-pedido_delivery = PedidoDelivery(cliente, itens, taxa_entrega)
+pedido = PedidoDelivery(cliente, itens, taxa_entrega)
 
-valor_pedido = pedido_delivery.calcular_total()
-#pagamento_cartao = PagamentoCartao().processar(valor_pedido)
-#pagamento_pix = PagamentoPIX().processar(valor_pedido)
-
+valor_pedido = pedido.calcular_total()
 tipo_pagamento = "pix"
-pagamento = PagamentoFactory.criar_pagamento(tipo_pagamento)
-pagamento.processar(valor_pedido)
+pagamento = PagamentoFactory.criar_pagamento(tipo_pagamento).processar(valor_pedido)
 
-MENSAGEM = "Seu pedido saiu para entrega!"
-# notificacao_email = NotificacaoEmail().enviar_notificacao(cliente, MENSAGEM)
-# notificacao_sms = NotificacaoSMS().enviar_notificacao(cliente, MENSAGEM)
+MENSAGEM_PAGO = f"Pagamento de {valor_pedido} via {tipo_pagamento} realizado com sucesso!"
+MENSAGEM_PREPARANDO = "Seu pedido está sendo preparado!"
+MENSAGEM_ENVIADO = "Seu pedido saiu para entrega!"
 
-notificacoes = NotificacaoFacade().enviar_notificacoes(cliente, MENSAGEM)
+notificacoes = NotificacaoFacade()
+observador = ObservadorStatus(notificacoes)
+pedido.adicionar_observadores(observador)
 
-pedido_delivery.status = " Pedido confirmado!"
-
-notificacoes = NotificacaoFacade().enviar_notificacoes(cliente, pedido_delivery.status)
+pedido.status = MENSAGEM_PAGO
+pedido.status = MENSAGEM_PREPARANDO
+pedido.status = MENSAGEM_ENVIADO
