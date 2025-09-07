@@ -9,6 +9,7 @@ from notificacao.notificacao_email import NotificacaoEmail
 from notificacao.notificacao_sms import NotificacaoSMS
 from notificacao.notificacao_facade import NotificacaoFacade
 
+
 cliente = Cliente("Lais", "Alura")
 item_um = Item("Pizza", 30.00)
 item_dois = Item("Suco", 5.00)
@@ -32,3 +33,7 @@ MENSAGEM = "Seu pedido saiu para entrega!"
 # notificacao_sms = NotificacaoSMS().enviar_notificacao(cliente, MENSAGEM)
 
 notificacoes = NotificacaoFacade().enviar_notificacoes(cliente, MENSAGEM)
+
+pedido_delivery.status = " Pedido confirmado!"
+
+notificacoes = NotificacaoFacade().enviar_notificacoes(cliente, pedido_delivery.status)
